@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: prueba
+      changes:
+        - createTable:
+            tableName: tbl_dummy
+            columns:
+              - column:
+                  name: id
+                  type: INT(4)
+                  constraints:
+                    primaryKey: true
+                    nullable: false

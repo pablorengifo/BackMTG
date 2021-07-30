@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <springProperty scope="context" name="infoProjectVersion" source="spring.application.name"/>
+
+    <appender name="STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>${LOGSTASH_SOCKET}</destination>
+
+        <encoder
+                class="com.everis.ecnf.core.starter.logstash.logback.encoder.LoggingEventCompositeJsonObfuscatorEncoder">
+            <providers>
+                <timestamp/>
+                <mdc/> <!-- MDC variables on the Thread will be written as JSON fields -->
+                <context/> <!--Outputs entries from logback's context -->
+                <version/> <!-- Logstash json format version, the @version field in the output -->
+                <logLevel/>
+                <loggerName/>
+
+                <pattern>
+                    <!-- we can add some custom fields to be sent with all the log entries. -->
+                    <!--make filtering easier in Logstash -->
+                    <!--or searching with Kibana -->
+                    <pattern>
+                        {
+                        "service-name": ${springAppName},
+                        "service-version": ${infoProjectVersion}
+                        }
+                    </pattern>
+                </pattern>
+
+                <threadName/>
+                <message/>
+
+                <logstashMarkers/> <!-- Useful so we can add extra information for specific log lines as Markers -->
+                <arguments/> <!--or through StructuredArguments -->
+
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg %mdc %n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC" class="reactor.logback.AsyncAppender">
+        <appender-ref ref="STASH"/>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="ASYNC"/>
+    </root>
+    <logger name="org.springframework.amqp" level="OFF"/>
+    <logger name="com.hazelcast.client" level="OFF"/>
+    <logger name="com.everis" level="ALL"/>
+    <logger name="net.logstash.logback.appender" level="ALL"/>
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+</configuration>

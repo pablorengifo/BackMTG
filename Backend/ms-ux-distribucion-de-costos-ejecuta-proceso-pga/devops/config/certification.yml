@@ -1,0 +1,4 @@
+REGISTRY_SERVER: crpdigitalcrt0100.azurecr.io
+REGISTRY_CID: az-cr-pdigital-cert	
+
+K8S_CONFIG_CID: AKSConfigPDigitalCert

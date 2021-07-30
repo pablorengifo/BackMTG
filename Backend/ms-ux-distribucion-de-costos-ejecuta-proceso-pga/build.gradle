@@ -1,0 +1,132 @@
+plugins {
+    id "jacoco"
+    id 'org.springframework.boot' version '2.2.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+    id 'java'
+    id "org.sonarqube" version "3.2.0"
+    id 'checkstyle'
+    id "com.benjaminsproule.swagger" version "1.0.13"
+}
+
+group = 'pe.com.pacifico.kuntur'
+version = '1.0.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+        url libs_release_local
+        credentials {
+            username = artifactory_user
+            password = artifactory_password
+        }
+    }
+    maven {
+        url plugins_release_local
+        credentials {
+            username = artifactory_user
+            password = artifactory_password
+        }
+    }
+}
+
+ext {
+	set('springCloudVersion', "Hoxton.SR3")
+	set('azureVersion', "2.3.1")
+}
+
+dependencies {
+    compile group: 'com.pacifico.kuntur', name : 'core', version: '0.0.9'
+    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-config', version: '2.2.2.RELEASE'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.squareup.okhttp:okhttp:2.5.0'
+    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.1.0.jre8'
+    compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
+
+	implementation 'com.microsoft.azure:azure-keyvault-secrets-spring-boot-starter'
+	
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    testImplementation('org.mockito:mockito-inline:3.4.0')
+    testImplementation('org.mockito:mockito-core:3.5.15')
+}
+
+checkstyle {
+    toolVersion '8.19'
+    configFile file("${project.rootDir}/checkstyle.xml")
+    checkstyleTest.enabled = false
+}
+
+checkstyleMain {
+    source ='src/main/java'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.microsoft.azure:azure-spring-boot-bom:${azureVersion}"
+    }
+}
+
+test {
+    useJUnitPlatform()
+    jacoco {
+        destinationFile = file("${buildDir}/jacoco/jacocoTest.exec")
+        classDumpDir = file("${buildDir}/jacoco/classpathdumps")
+    }
+    jacocoTestReport {
+        reports {
+            xml.enabled true
+            xml.destination file("${buildDir}/jacoco/jacoco.xml")
+            csv.enabled false
+            html.destination file("${buildDir}/jacocoHtml")
+        }
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.sources", "src/main/java"
+        property "sonar.tests", "src/test/java"
+        property "sonar.login","2c9f339698b2078c4ca3960d718d75489cfce423"
+        property "sonar.host.url", "http://localhost:9000"
+        property "sonar.coverage.exclusions",
+                "**/config/**," +
+                        "**/advice/**," +
+                        "**/model/**," +
+                        "**/webclient/**," +
+                        "**/kuntur/*Application*"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/jacoco/jacoco.xml"
+    }
+}
+
+swagger {
+    delete fileTree('devops') {
+        include '**/*.json'
+    }
+    apiSource {
+        springmvc = true
+        locations = ['pe.com.pacifico.kuntur.expose.EjecucionesController']
+        schemes = ['https']
+        info {
+            title = 'ms-ux-distribucion-de-costos-ejecuta-proceso-pga'
+            description = 'Microservicio para ejecuciones procesos '
+            version = '1.0.0'
+        }
+        swaggerDirectory = 'devops'
+        swaggerFileName = 'swagger'
+        attachSwaggerArtifact = true
+    }
+    project.tasks["sonarqube"].dependsOn "test"
+    plugins.withType(JacocoPlugin) {
+        tasks["test"].finalizedBy 'jacocoTestReport'
+    }
+}

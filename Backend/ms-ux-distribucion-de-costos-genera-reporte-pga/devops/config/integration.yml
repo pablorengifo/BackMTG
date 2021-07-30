@@ -1,0 +1,4 @@
+REGISTRY_SERVER: crpdigitaldes0100.azurecr.io
+REGISTRY_CID: az-cr-pdigital-desa
+
+K8S_CONFIG_CID: AKSConfigPDigitalDesa

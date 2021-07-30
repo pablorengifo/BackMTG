@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <springProperty scope="context" name="springAppName" source="spring.application.name"/>
+    <springProperty scope="context" name="infoProjectVersion" source="spring.application.name"/>
+
+    <appender name="STASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <!--<destination>${LOGSTASH_SOCKET}</destination>-->
+        <destination>127.0.0.1:8989</destination>
+
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp/>
+                <mdc/>
+                <context/>
+                <version/>
+                <logLevel/>
+                <loggerName/>
+
+                <pattern>
+                    <!--<pattern>
+                        {
+                        "service-name": ${springAppName},
+                        "service-version": ${infoProjectVersion}
+                        }
+                    </pattern>-->
+                </pattern>
+
+                <threadName/>
+                <message/>
+
+                <logstashMarkers/>
+                <arguments/>
+
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %highlight(%-5level) %logger{36}.%M - %msg %mdc %n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--appender name="ASYNC" class="reactor.logback.AsyncAppender">
+        <appender-ref ref="STASH"/>
+    </appender-->
+
+    <root level="INFO">
+        <!--appender-ref ref="ASYNC"/-->
+    </root>
+    <logger name="org.springframework.amqp" level="OFF"/>
+    <logger name="com.hazelcast.client" level="OFF"/>
+    <logger name="com.everis" level="ALL"/>
+    <logger name="net.logstash.logback.appender" level="ALL"/>
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+</configuration>

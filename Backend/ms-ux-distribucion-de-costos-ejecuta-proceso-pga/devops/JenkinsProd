@@ -1,0 +1,77 @@
+@Library('jenkins-library@master')_
+
+pipeline {
+    agent {
+        label 'agent-1'
+    }
+    environment {
+        ENVIRONMENT     = 'production'
+        K8S_NAMESPACE   = 'TODO_K8S_NAMESPACE'
+        SERVICE_NAME    = 'ms-ux-distribucion-de-costos-ejecuta-proceso-pga'
+    }
+    stages{
+        stage("Prepare"){
+            steps {
+                script {
+                    notification(type:'started', env:ENVIRONMENT)
+                    config = readYaml file: "./devops/config/${ENVIRONMENT}.yml"
+                }
+            }
+        }
+        stage("Exist Image?") {
+            steps {
+                script {
+                    IMAGE_EXIST = dockerAz.imageExist(
+                        userCID: config.AZ_USER_CID,
+                        passCID: config.AZ_PASSWORD_CID,
+                        acrName: config.REGISTRY_NAME,
+                        imageName: SERVICE_NAME,
+                        imageTag: BRANCH_NAME,
+                    )
+                }
+            }
+        }
+        stage("Promotion") {
+            when { expression { IMAGE_EXIST == 'no' } }
+            steps {
+                script {
+                    dockerAz.promote(
+                        userCID: config.AZ_USER_CID,
+                        passCID: config.AZ_PASSWORD_CID,
+                        acrName: config.REGISTRY_NAME,
+                        acrSourceCID: config.REGISTRY_CERT_CID,
+                        imageName: SERVICE_NAME,
+                        imageTag: BRANCH_NAME,
+                        imageSourceTag: "latest"
+                    )
+                }
+            }
+        }
+        stage("Deploy") {
+            steps {
+                script {
+                    deploy.k8s(
+                        config: config.K8S_CONFIG_CID,
+                        registryServer: config.REGISTRY_SERVER,
+                        imageName: SERVICE_NAME,
+                        tag: BRANCH_NAME,
+                        profile: ENVIRONMENT,
+                        namespace: K8S_NAMESPACE,
+                        deletePod: false
+                    )
+                }
+            }
+        }
+    }
+    post {
+        success {
+            notification(type:'success', env:ENVIRONMENT)
+        }
+        failure {
+            notification(type:'failure', env:ENVIRONMENT)
+        }
+        cleanup {
+            deleteDir()
+        }
+    }
+}

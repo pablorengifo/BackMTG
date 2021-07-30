@@ -1,0 +1,8 @@
+AZ_USER_CID: az-user-prod
+AZ_PASSWORD_CID: az-pass-prod
+
+REGISTRY_NAME: crpdigitalprd0100
+REGISTRY_SERVER: crpdigitalprd0100.azurecr.io
+REGISTRY_CERT_CID: az-cr-pdigital-cert
+
+K8S_CONFIG_CID: AKSConfigPDigitalCanalProd

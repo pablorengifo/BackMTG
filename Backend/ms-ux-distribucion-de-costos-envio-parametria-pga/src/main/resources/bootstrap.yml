@@ -1,0 +1,34 @@
+application:
+  ecnf:
+    api:
+      path: /
+
+spring:
+  application:
+    name: ms-dummy-bd-v1
+  main:
+    allow-bean-definition-overriding: true
+
+info:
+  project:
+    version: 1.0.0
+    title: MS Dummy demo
+    description: prueba
+    expose.package: pe.com.pacifico.kuntur.expose
+
+management:
+  endpoints:
+    web:
+      base-path: /
+
+azure:
+  keyvault:
+    enabled: '${AZURE_KV_ENABLED:false}'
+    uri: '${AZURE_KV_URI:http://localhost:888/xxxx}'
+    client-id: '${AZURE_KV_CLIENT_ID:aaaa}'
+    client-key: '${AZURE_KV_CLIENT_KEY:bbbb}'
+    tenant-id: '${AZURE_KV_TENANT_ID:cccc}'
+  
+health:
+  config:
+    enabled: false

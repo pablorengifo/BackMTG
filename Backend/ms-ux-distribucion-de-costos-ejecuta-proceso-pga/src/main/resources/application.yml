@@ -1,0 +1,67 @@
+server:
+  port: 9092
+  servlet:
+    context-path: /ms-ux-distribucion-de-costos-ejecuta-proceso-pga/v1
+
+spring:
+  codec:
+    max-in-memory-size: 10MB
+  application:
+    name: ms-ux-distribucion-de-costos-ejecuta-proceso-pga-v1
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:sqlserver://localhost:50000;databaseName=prueba
+    username: pcfuser
+    password: SQL_1234
+    driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+  
+eureka:
+  client:
+    enabled: false
+
+api:
+  support:
+    base:
+      ejecuciones:
+        url: http://localhost:9080/ejecuciones
+        Authorization: 1234557aa
+        ocp-apim-subscription-key: 926ec90111ea4d3bb44699fa01f01c1baa
+        ocp-apim-trace: true
+webclient:
+  connect:
+    time-out.millis: 50000
+  read:
+    time-out.seconds: 50
+  write:
+    time-out.seconds: 50
+  circuit-breaker:
+      time-out.seconds: 4
+
+date-format-allowed:
+  data-format-string: "DD/MM/YYYY|m/d/yy|M/D/YY|MM/DD/YY|MM/DD/YYYY|YY-MM-DD|YYYY-MM-DD"
+  data-format: "58|31"
+
+info:
+  project:
+    version: 1.0.0
+    title: MS Distribucion Costos Ejecuciones
+    description: Microservicio para ejecuciones procesos 
+    expose.package: pe.com.pacifico.kuntur.expose
+  
+logging:
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
+    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
+  level:
+    org.springframework.web: ERROR
+    pe.com.pacifico.kuntur: DEBUG
+    org.hibernate: ERROR
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG

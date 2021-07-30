@@ -1,0 +1,67 @@
+@Library('jenkins-library@master')_
+
+pipeline {
+    agent {
+        label 'agent-1'
+    }
+    environment {
+        K8S_NAMESPACE   = 'TODO_K8S_NAMESPACE'
+        SERVICE_NAME    = 'ms-ux-distribucion-de-costos-genera-reporte-pga'
+        ENVIRONMENT     = 'certification'
+    }
+    stages{
+        stage("Prepare"){
+            steps {
+                script {
+                    config = readYaml file: "./devops/config/${ENVIRONMENT}.yml"
+                }
+            }
+        }
+        stage("Build & Push Image") {
+            steps {
+                script {
+                    notification(type:'started', env:ENVIRONMENT)
+                    gradle.build()
+                    dockerBuildPublish.azure(
+                        registryServer: config.REGISTRY_SERVER,
+                        registryCredentials: config.REGISTRY_CID,
+                        imageName: SERVICE_NAME,
+                        imageTag: "latest"
+                    )
+                }
+            }
+        }
+        stage("Deploy") {
+            steps {
+                script {
+                    deploy.k8s(
+                        config: config.K8S_CONFIG_CID,
+                        registryServer: config.REGISTRY_SERVER,
+                        imageName: SERVICE_NAME,
+                        tag: "latest",
+                        profile: ENVIRONMENT,
+                        namespace: K8S_NAMESPACE
+                    )
+                }
+            }
+        }
+        stage("Freezing code") {
+            steps {
+                script {
+                    gitTag.gradle()
+                }
+            }
+        }
+    }
+    post {
+        success {
+            notification(type:'success', env:ENVIRONMENT)
+        }
+        failure {
+            notification(type:'failure', env:ENVIRONMENT)
+        }
+        cleanup {
+            deleteDir()
+        }
+    }
+}
