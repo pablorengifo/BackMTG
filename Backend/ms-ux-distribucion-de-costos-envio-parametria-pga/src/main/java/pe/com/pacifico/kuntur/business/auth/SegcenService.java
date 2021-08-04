@@ -6,7 +6,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.axis2.client.Options;
+import org.apache.axis2.transport.http.HTTPConstants;
+import org.apache.axis2.transport.http.impl.httpclient4.HttpTransportPropertiesImpl;
 import org.springframework.stereotype.Service;
+import org.tempuri.SegCenServicioStub;
 
 /**
  * <b>Class</b>: SegcenService <br/>
@@ -93,6 +97,31 @@ public class SegcenService {
     int intPVersion = 0;
     String strpip = "";
     String strPHostName = "";
+
+    try {
+      SegCenServicioStub segcen = new SegCenServicioStub();
+      Options options = segcen._getServiceClient().getOptions();
+      HttpTransportPropertiesImpl.Authenticator basicAuth = new HttpTransportPropertiesImpl.Authenticator();
+      basicAuth.setUsername("SERMDGDTPDES");
+      basicAuth.setPassword("x7UkZa56$BL");
+      options.setProperty(HTTPConstants.AUTHENTICATE, basicAuth);
+
+      SegCenServicioStub.ObtenerRolesUsuarioAplicacion asker = new SegCenServicioStub.ObtenerRolesUsuarioAplicacion();
+      asker.setStrIdUsuario(userOnPremise);
+      asker.setInt_pMayor(intPMayor);
+      asker.setInt_pMinor(intPMinor);
+      asker.setInt_pVersion(intPVersion);
+      asker.setStr_pCodigoAplicacion(strPCodigoAplicacion);
+      SegCenServicioStub.ObtenerRolesUsuarioAplicacionResponse response = segcen.obtenerRolesUsuarioAplicacion(asker);
+      System.out.println("Reading response: ");
+      for(int x = 0; x < response.getObtenerRolesUsuarioAplicacionResult().getRolBE().length; x++){
+        System.out.println(">>>" + response.getObtenerRolesUsuarioAplicacionResult().getRolBE()[x].getCodigoRol() + " - " +
+            response.getObtenerRolesUsuarioAplicacionResult().getRolBE()[x].getNombreRol());
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
 
     //ISegCenServicios iSegCenServicios = new
     /*String response = segCenService.("SERMDGDTPDES", "x7UkZa56$BL",
