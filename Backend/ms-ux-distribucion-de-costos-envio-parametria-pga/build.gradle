@@ -37,35 +37,92 @@ repositories {
 }
 
 ext {
-	set('springCloudVersion', "Hoxton.SR3")
-	set('azureVersion', "2.3.1")
+	  set('springCloudVersion', "Hoxton.SR3")
+	  set('azureVersion', "2.3.1")
+    set('nettyVersion',"4.1.65.Final")
+}
+
+configurations.all {
+    exclude group: "com.sun.mail", module: "javax.mail"
+    exclude group: 'org.nanohttpd', module: 'nanohttpd'
 }
 
 dependencies {
-    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
-    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-    //compile group: 'javax.persistence', name: 'persistence-api', version: '1.0'
-    //compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.0-api', version: '1.0.1.Final'
-    implementation group: 'javax.jws', name: 'javax.jws-api', version: '1.1'
 
-    implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0'
-    implementation group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
-    compile group: 'org.apache.axis2', name: 'axis2', version: '1.7.3', ext:'pom'
-    compile group: 'org.apache.axis2', name: 'axis2-kernel', version: '1.7.9'
-    compile group: 'org.apache.axis2', name: 'axis2-adb', version: '1.7.9'
-    compile group: 'org.apache.axis2', name: 'axis2-transport-http', version: '1.7.9'
+    compile (group: 'com.pacifico.kuntur', name : 'core', version: '0.0.9')  {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+        exclude group: 'org.yaml', module: 'snakeyaml'
+        exclude group: 'org.hibernate.validator', module: 'hibernate-validator'
+        exclude group: 'net.minidev', module: 'json-smart'
+        exclude group: 'io.netty', module: 'netty-handler'
+        exclude group: 'io.netty', module: 'netty-handler-proxy'
+        exclude group: 'io.netty', module: 'netty-codec-http'
+        exclude group: 'io.netty', module: 'netty-codec-http2'
+        exclude group: 'io.netty', module: 'netty-common'
+        exclude group: 'io.netty', module: 'netty-tcnative-boringssl-static'
+        exclude group: 'io.netty', module: 'netty-transport'
+        exclude group: 'io.netty', module: 'netty-codec'
+        exclude group: 'io.netty', module: 'netty-codec-socks'
+        exclude group: 'io.netty', module: 'netty-resolver'
+        exclude group: 'io.netty', module: 'netty-transport-native-epoll'
+        exclude group: 'io.netty', module: 'netty-transport-native-unix-common'
+        exclude group: 'com.nimbusds', module: 'nimbus-jose-jwt'
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+        exclude group: 'org.apache.commons', module: 'commons-math'
+        exclude group: 'com.thoughtworks.xstream', module: 'xstream'
+        exclude group: 'commons-io', module: 'commons-io'
+        exclude group: 'com.google.guava', module: 'guava'
+    }
 
-    compile group: 'com.pacifico.kuntur', name : 'core', version: '0.0.9'
-    compile group: 'org.springframework.cloud', name: 'spring-cloud-starter-config', version: '2.2.2.RELEASE'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.10.5.1'
+    compile group: 'org.yaml', name: 'snakeyaml', version: '1.26'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.20.Final'
+    compile group: 'net.minidev', name: 'json-smart', version: '2.4.1'
+    compile group: 'io.netty', name: 'netty-handler', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-handler-proxy', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-codec-http', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-codec-http2', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-common', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-transport', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-buffer', version: "${nettyVersion}"
+    compile group: 'io.netty', name: 'netty-tcnative-boringssl-static', version: '2.0.40.Final'
+    compile group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '7.9'
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.10.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.5.3'
 
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile (group: 'org.springframework.cloud', name: 'spring-cloud-starter-config', version: '2.2.2.RELEASE') {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+    }
+
+    implementation ('org.springframework.boot:spring-boot-starter-data-jpa') {
+        exclude group: 'org.dom4j', module: 'dom4j'
+    }
+
+    implementation group: 'org.dom4j', name: 'dom4j', version: '2.1.3'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.squareup.okhttp:okhttp:2.5.0'
-    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.1.0.jre8'
+
+    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '8.4.1.jre8'
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.3'
     compile 'org.apache.poi:poi-ooxml:3.15'
 
     implementation 'com.microsoft.azure:azure-keyvault-secrets-spring-boot-starter'
+
+    // init: Additional AXIS2 dependencies
+    implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
+
+    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    compileOnly group: 'javax.jws', name: 'javax.jws-api', version: '1.1'
+
+    compileOnly group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.0'
+    compileOnly group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
+    compileOnly group: 'org.apache.axis2', name: 'axis2', version: '1.7.3', ext:'pom'
+    compileOnly group: 'org.apache.axis2', name: 'axis2-kernel', version: '1.7.9'
+    compileOnly group: 'org.apache.axis2', name: 'axis2-adb', version: '1.7.9'
+    compileOnly group: 'org.apache.axis2', name: 'axis2-transport-http', version: '1.7.9'
+    // end: Additional AXIS2 dependencies
 
     annotationProcessor 'org.projectlombok:lombok:1.18.12'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'

@@ -11,9 +11,9 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:sqlserver://localhost:40000;databaseName=DISTCOSTOS
-    username: pcfuser
-    password: SQL_1234
+    url: jdbc:sqlserver://localhost:1433;databaseName=DummyDb
+    username: asmws
+    password: mypass1.
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
   jpa:
     show-sql: true
