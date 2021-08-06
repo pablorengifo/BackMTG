@@ -1,0 +1,9 @@
+{
+  "info" : {
+    "description" : "Microservicio para parametrias",
+    "title" : "ms-ux-distribucion-de-costos-envio-parametria-pga",
+    "version" : "1.0.0"
+  },
+  "schemes" : [ "https" ],
+  "swagger" : "2.0"
+}
